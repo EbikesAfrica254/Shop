@@ -1,0 +1,1134 @@
+/* Battery Replacement Page Styles */
+
+/* Base Variables */
+:root {
+  --battery-primary: #3b82f6;
+  --battery-primary-dark: #2563eb;
+  --battery-secondary: #10b981;
+  --battery-accent: #f59e0b;
+  --battery-danger: #ef4444;
+  --battery-success: #22c55e;
+  --battery-warning: #f59e0b;
+  
+  --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --gradient-secondary: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-hero: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Page Container */
+.battery-replacement-page {
+  background: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.hero-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-hero);
+}
+
+.hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.15) 1px, transparent 0);
+  background-size: 20px 20px;
+  opacity: 0.5;
+}
+
+.hero-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  min-height: 80vh;
+}
+
+.hero-text {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 9999px;
+  color: var(--battery-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.badge-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+.title-highlight {
+  display: block;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  max-width: 90%;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: var(--battery-primary);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-visual {
+  position: relative;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.hero-image-container {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hero-image-container:hover .hero-image {
+  transform: scale(1.05);
+}
+
+.floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.floating-badge {
+ position: absolute;
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 0.75rem 1rem;
+ background: rgba(255, 255, 255, 0.95);
+ backdrop-filter: blur(10px);
+ border-radius: 0.75rem;
+ box-shadow: var(--shadow-medium);
+ font-size: 0.875rem;
+ font-weight: 600;
+ color: #374151;
+ animation: float 3s ease-in-out infinite;
+}
+
+.floating-badge-1 {
+ top: 10%;
+ right: 10%;
+ animation-delay: 0s;
+}
+
+.floating-badge-2 {
+ bottom: 20%;
+ left: 10%;
+ animation-delay: 1s;
+}
+
+.floating-badge-3 {
+ top: 60%;
+ right: 5%;
+ animation-delay: 2s;
+}
+
+/* Button Styles */
+.btn {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ gap: 0.5rem;
+ padding: 0.75rem 1.5rem;
+ font-size: 0.875rem;
+ font-weight: 600;
+ line-height: 1;
+ border-radius: 0.75rem;
+ transition: all 0.2s ease;
+ cursor: pointer;
+ border: none;
+ text-decoration: none;
+ white-space: nowrap;
+ user-select: none;
+}
+
+.btn-primary {
+ background: var(--gradient-primary);
+ color: white;
+ box-shadow: var(--shadow-medium);
+}
+
+.btn-primary:hover {
+ transform: translateY(-2px);
+ box-shadow: var(--shadow-large);
+}
+
+.btn-secondary {
+ background: white;
+ color: var(--battery-primary);
+ border: 2px solid var(--battery-primary);
+ box-shadow: var(--shadow-soft);
+}
+
+.btn-secondary:hover {
+ background: var(--battery-primary);
+ color: white;
+ transform: translateY(-2px);
+}
+
+.btn-outline {
+ background: transparent;
+ color: var(--battery-primary);
+ border: 2px solid var(--battery-primary);
+}
+
+.btn-outline:hover {
+ background: var(--battery-primary);
+ color: white;
+}
+
+.btn-lg {
+ padding: 1rem 2rem;
+ font-size: 1rem;
+}
+
+.btn-full {
+ width: 100%;
+}
+
+.btn-icon {
+ width: 1.25rem;
+ height: 1.25rem;
+}
+
+/* Section Styles */
+.section-container {
+ max-width: 1280px;
+ margin: 0 auto;
+ padding: 5rem 1rem;
+}
+
+.section-header {
+ text-align: center;
+ margin-bottom: 4rem;
+}
+
+.section-title {
+ font-size: clamp(2rem, 4vw, 3rem);
+ font-weight: 900;
+ color: #111827;
+ margin-bottom: 1rem;
+ letter-spacing: -0.025em;
+}
+
+.section-subtitle {
+ font-size: 1.25rem;
+ color: #6b7280;
+ max-width: 600px;
+ margin: 0 auto;
+ line-height: 1.6;
+}
+
+/* Services Section */
+.services-section {
+ background: #f9fafb;
+}
+
+.services-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+ gap: 2rem;
+}
+
+.service-card {
+ background: white;
+ padding: 2rem;
+ border-radius: 1.5rem;
+ box-shadow: var(--shadow-soft);
+ transition: all 0.3s ease;
+ border: 1px solid #e5e7eb;
+}
+
+.service-card:hover {
+ transform: translateY(-8px);
+ box-shadow: var(--shadow-large);
+}
+
+.service-icon {
+ width: 4rem;
+ height: 4rem;
+ background: var(--gradient-primary);
+ border-radius: 1rem;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: white;
+ margin-bottom: 1.5rem;
+}
+
+.service-title {
+ font-size: 1.5rem;
+ font-weight: 700;
+ color: #111827;
+ margin-bottom: 0.75rem;
+}
+
+.service-description {
+ color: #6b7280;
+ line-height: 1.6;
+ margin-bottom: 1.5rem;
+}
+
+.service-features {
+ list-style: none;
+ padding: 0;
+ margin: 0;
+}
+
+.feature-item {
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ margin-bottom: 0.75rem;
+ font-size: 0.875rem;
+ color: #374151;
+}
+
+.feature-icon {
+ width: 1rem;
+ height: 1rem;
+ color: var(--battery-success);
+ flex-shrink: 0;
+}
+
+/* Battery Health Section */
+.battery-health-section {
+ background: white;
+}
+
+.health-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+ gap: 1.5rem;
+ margin-bottom: 3rem;
+}
+
+.health-card {
+ background: #f9fafb;
+ padding: 2rem;
+ border-radius: 1.5rem;
+ text-align: center;
+ transition: all 0.3s ease;
+ border: 2px solid transparent;
+}
+
+.health-card:hover {
+ transform: translateY(-4px);
+ border-color: var(--battery-primary);
+ box-shadow: var(--shadow-medium);
+}
+
+.health-icon {
+ width: 4rem;
+ height: 4rem;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ margin: 0 auto 1.5rem;
+}
+
+.health-percentage {
+ font-size: 1.5rem;
+ font-weight: 900;
+ color: #111827;
+ margin-bottom: 0.5rem;
+}
+
+.health-status {
+ font-size: 1.125rem;
+ font-weight: 700;
+ margin-bottom: 0.5rem;
+}
+
+.health-action {
+ font-size: 0.875rem;
+ font-weight: 600;
+ color: #6b7280;
+ margin-bottom: 0.75rem;
+}
+
+.health-description {
+ font-size: 0.875rem;
+ color: #9ca3af;
+ line-height: 1.5;
+}
+
+.health-cta {
+ text-align: center;
+}
+
+/* Battery Options Section */
+.battery-options-section {
+ background: #f9fafb;
+}
+
+.battery-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+ gap: 2rem;
+}
+
+.battery-card {
+ background: white;
+ border-radius: 1.5rem;
+ overflow: hidden;
+ box-shadow: var(--shadow-soft);
+ transition: all 0.3s ease;
+ position: relative;
+ border: 2px solid transparent;
+}
+
+.battery-card:hover {
+ transform: translateY(-8px);
+ box-shadow: var(--shadow-xl);
+}
+
+.battery-card-popular {
+ border-color: var(--battery-primary);
+ box-shadow: var(--shadow-large);
+}
+
+.battery-badge {
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ padding: 0.75rem;
+ text-align: center;
+ font-size: 0.875rem;
+ font-weight: 700;
+ color: white;
+ z-index: 2;
+}
+
+.badge-popular {
+ background: var(--gradient-primary);
+}
+
+.badge-standard {
+ background: var(--gradient-secondary);
+}
+
+.battery-image-container {
+ position: relative;
+ height: 250px;
+ overflow: hidden;
+}
+
+.battery-image {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ transition: transform 0.3s ease;
+}
+
+.battery-card:hover .battery-image {
+ transform: scale(1.1);
+}
+
+.battery-overlay {
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ right: 0;
+ background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+ padding: 2rem 1.5rem 1.5rem;
+}
+
+.price-tag {
+ color: white;
+}
+
+.current-price {
+ font-size: 1.875rem;
+ font-weight: 900;
+ line-height: 1;
+ margin-bottom: 0.25rem;
+}
+
+.original-price {
+ font-size: 1rem;
+ text-decoration: line-through;
+ opacity: 0.8;
+}
+
+.battery-content {
+ padding: 2rem;
+}
+
+.battery-name {
+ font-size: 1.5rem;
+ font-weight: 700;
+ color: #111827;
+ margin-bottom: 0.5rem;
+}
+
+.battery-ideal {
+ color: var(--battery-primary);
+ font-weight: 600;
+ margin-bottom: 1.5rem;
+}
+
+.battery-specs {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 1rem;
+ margin-bottom: 1.5rem;
+ padding: 1rem;
+ background: #f9fafb;
+ border-radius: 0.75rem;
+}
+
+.spec-item {
+ text-align: center;
+}
+
+.spec-label {
+ display: block;
+ font-size: 0.75rem;
+ color: #6b7280;
+ text-transform: uppercase;
+ letter-spacing: 0.05em;
+ margin-bottom: 0.25rem;
+}
+
+.spec-value {
+ font-weight: 700;
+ color: #111827;
+ font-size: 0.875rem;
+}
+
+.battery-features {
+ margin-bottom: 1.5rem;
+}
+
+.features-more {
+ font-size: 0.875rem;
+ color: var(--battery-primary);
+ font-weight: 600;
+ margin-top: 0.5rem;
+}
+
+.battery-warranty {
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ margin-bottom: 1.5rem;
+ padding: 0.75rem;
+ background: rgba(16, 185, 129, 0.1);
+ border-radius: 0.5rem;
+ font-size: 0.875rem;
+ color: var(--battery-success);
+ font-weight: 600;
+}
+
+.warranty-icon {
+ width: 1rem;
+ height: 1rem;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+ background: white;
+}
+
+.testimonials-container {
+ max-width: 800px;
+ margin: 0 auto;
+}
+
+.testimonial-slider {
+ position: relative;
+ height: 300px;
+ overflow: hidden;
+ border-radius: 1.5rem;
+}
+
+.testimonial-card {
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: #f9fafb;
+ border-radius: 1.5rem;
+ padding: 2rem;
+ opacity: 0;
+ transform: translateX(100%);
+ transition: all 0.5s ease;
+}
+
+.testimonial-card.active {
+ opacity: 1;
+ transform: translateX(0);
+}
+
+.testimonial-content {
+ text-align: center;
+ height: 100%;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+}
+
+.stars {
+ display: flex;
+ justify-content: center;
+ gap: 0.25rem;
+ margin-bottom: 1.5rem;
+}
+
+.star {
+ width: 1.25rem;
+ height: 1.25rem;
+}
+
+.star-filled {
+ color: #fbbf24;
+ fill: currentColor;
+}
+
+.testimonial-text {
+ font-size: 1.125rem;
+ line-height: 1.7;
+ color: #374151;
+ margin-bottom: 2rem;
+ font-style: italic;
+}
+
+.testimonial-author {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 1rem;
+}
+
+.author-image {
+ width: 3rem;
+ height: 3rem;
+ border-radius: 50%;
+ object-fit: cover;
+}
+
+.author-info {
+ text-align: left;
+}
+
+.author-name {
+ font-weight: 700;
+ color: #111827;
+ margin-bottom: 0.25rem;
+}
+
+.author-role {
+ font-size: 0.875rem;
+ color: #6b7280;
+}
+
+.testimonial-indicators {
+ display: flex;
+ justify-content: center;
+ gap: 0.75rem;
+ margin-top: 2rem;
+}
+
+.indicator {
+ width: 0.75rem;
+ height: 0.75rem;
+ border-radius: 50%;
+ background: #d1d5db;
+ border: none;
+ cursor: pointer;
+ transition: all 0.2s ease;
+}
+
+.indicator.active {
+ background: var(--battery-primary);
+ transform: scale(1.2);
+}
+
+/* Installation Section */
+.installation-section {
+ background: #f9fafb;
+}
+
+.installation-content {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 4rem;
+ align-items: center;
+}
+
+.installation-text {
+ order: 1;
+}
+
+.installation-visual {
+ position: relative;
+ order: 2;
+}
+
+.process-steps {
+ margin-top: 2rem;
+}
+
+.step-item {
+ display: flex;
+ gap: 1rem;
+ margin-bottom: 2rem;
+}
+
+.step-number {
+ width: 2.5rem;
+ height: 2.5rem;
+ background: var(--gradient-primary);
+ color: white;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-weight: 700;
+ flex-shrink: 0;
+}
+
+.step-content h4 {
+ font-size: 1.125rem;
+ font-weight: 700;
+ color: #111827;
+ margin-bottom: 0.5rem;
+}
+
+.step-content p {
+ color: #6b7280;
+ line-height: 1.6;
+}
+
+.installation-image {
+ width: 100%;
+ border-radius: 1.5rem;
+ box-shadow: var(--shadow-large);
+}
+
+.installation-badges {
+ position: absolute;
+ bottom: -1rem;
+ left: 1rem;
+ right: 1rem;
+ display: flex;
+ justify-content: space-between;
+ gap: 0.5rem;
+}
+
+.install-badge {
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 0.75rem 1rem;
+ background: white;
+ border-radius: 0.75rem;
+ box-shadow: var(--shadow-medium);
+ font-size: 0.875rem;
+ font-weight: 600;
+ color: #374151;
+ flex: 1;
+ justify-content: center;
+}
+
+/* CTA Section */
+.cta-section {
+ background: var(--gradient-primary);
+ color: white;
+ position: relative;
+ overflow: hidden;
+}
+
+.cta-section::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+ pointer-events: none;
+}
+
+.cta-container {
+ max-width: 1280px;
+ margin: 0 auto;
+ padding: 5rem 1rem;
+ text-align: center;
+ position: relative;
+ z-index: 1;
+}
+
+.cta-title {
+ font-size: clamp(2rem, 4vw, 3rem);
+ font-weight: 900;
+ margin-bottom: 1rem;
+ letter-spacing: -0.025em;
+}
+
+.cta-subtitle {
+ font-size: 1.25rem;
+ opacity: 0.9;
+ margin-bottom: 3rem;
+ max-width: 600px;
+ margin-left: auto;
+ margin-right: auto;
+ line-height: 1.6;
+}
+
+.cta-features {
+ display: flex;
+ justify-content: center;
+ gap: 2rem;
+ margin-bottom: 3rem;
+ flex-wrap: wrap;
+}
+
+.cta-feature {
+ display: flex;
+ align-items: center;
+ gap: 0.75rem;
+ font-weight: 600;
+ opacity: 0.9;
+}
+
+.cta-actions {
+ display: flex;
+ justify-content: center;
+ gap: 1rem;
+ margin-bottom: 2rem;
+ flex-wrap: wrap;
+}
+
+.cta-actions .btn-primary {
+ background: white;
+ color: var(--battery-primary);
+}
+
+.cta-actions .btn-primary:hover {
+ background: #f3f4f6;
+}
+
+.cta-actions .btn-secondary {
+ background: transparent;
+ color: white;
+ border-color: white;
+}
+
+.cta-actions .btn-secondary:hover {
+ background: white;
+ color: var(--battery-primary);
+}
+
+.cta-guarantee {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 0.5rem;
+ opacity: 0.8;
+ font-size: 0.875rem;
+}
+
+/* Animations */
+@keyframes gradient-shift {
+ 0%, 100% {
+   background-position: 0% 50%;
+ }
+ 50% {
+   background-position: 100% 50%;
+ }
+}
+
+@keyframes float {
+ 0%, 100% {
+   transform: translateY(0px);
+ }
+ 50% {
+   transform: translateY(-10px);
+ }
+}
+
+.animate-slide-up {
+ animation: slideUp 1s ease-out forwards;
+}
+
+.animate-delay-300 {
+ animation-delay: 0.3s;
+}
+
+@keyframes slideUp {
+ to {
+   opacity: 1;
+   transform: translateY(0);
+ }
+}
+
+/* Scroll Animations */
+.animate-on-scroll {
+ opacity: 0;
+ transform: translateY(30px);
+ transition: all 0.8s ease;
+}
+
+.animate-on-scroll.animate-in {
+ opacity: 1;
+ transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+ .hero-content {
+   grid-template-columns: 1fr;
+   gap: 3rem;
+   text-align: center;
+ }
+ 
+ .hero-visual {
+   order: -1;
+ }
+ 
+ .installation-content {
+   grid-template-columns: 1fr;
+   gap: 3rem;
+ }
+ 
+ .installation-visual {
+   order: -1;
+ }
+}
+
+@media (max-width: 768px) {
+ .section-container {
+   padding: 3rem 1rem;
+ }
+ 
+ .hero-stats {
+   justify-content: center;
+ }
+ 
+ .hero-actions {
+   justify-content: center;
+ }
+ 
+ .battery-grid {
+   grid-template-columns: 1fr;
+ }
+ 
+ .services-grid {
+   grid-template-columns: 1fr;
+ }
+ 
+ .health-grid {
+   grid-template-columns: 1fr;
+ }
+ 
+ .battery-specs {
+   grid-template-columns: 1fr;
+ }
+ 
+ .cta-features {
+   flex-direction: column;
+   align-items: center;
+ }
+ 
+ .cta-actions {
+   flex-direction: column;
+   align-items: center;
+ }
+ 
+ .installation-badges {
+   flex-direction: column;
+   gap: 0.75rem;
+ }
+}
+
+@media (max-width: 640px) {
+ .hero-container {
+   padding: 0 0.75rem;
+ }
+ 
+ .floating-badge {
+   display: none;
+ }
+ 
+ .btn {
+   width: 100%;
+   justify-content: center;
+ }
+ 
+ .hero-actions .btn {
+   width: auto;
+   min-width: 200px;
+ }
+}
+
+/* Print Styles */
+@media print {
+ .floating-elements,
+ .cta-section {
+   display: none;
+ }
+ 
+ .battery-card {
+   break-inside: avoid;
+ }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+ .battery-replacement-page {
+   background: #111827;
+   color: #f9fafb;
+ }
+ 
+ .service-card,
+ .health-card,
+ .battery-card,
+ .testimonial-card {
+   background: #1f2937;
+   border-color: #374151;
+ }
+ 
+ .section-title {
+   color: #f9fafb;
+ }
+ 
+ .section-subtitle {
+   color: #d1d5db;
+ }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+ * {
+   animation-duration: 0.01ms !important;
+   animation-iteration-count: 1 !important;
+   transition-duration: 0.01ms !important;
+ }
+ 
+ .floating-badge {
+   animation: none;
+ }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+ .btn {
+   border-width: 2px;
+ }
+ 
+ .battery-card:hover {
+   border-width: 3px;
+ }
+}

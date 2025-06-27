@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Basic Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- Primary Meta Tags -->
+    <title>E-Bikes Africa - Sustainable Electric Bikes for African Roads</title>
+    <meta name="title" content="E-Bikes Africa - Sustainable Electric Bikes for African Roads" />
+    <meta name="description" content="Leading the electric mobility revolution across Africa with high-quality, sustainable e-bikes designed for African roads. Join the green movement today!" />
+    <meta name="keywords" content="electric bikes, e-bikes, Africa, sustainable transport, green mobility, electric bicycles, eco-friendly, carbon neutral, Nairobi, Kenya" />
+    <meta name="author" content="E-Bikes Africa" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ebikesafrica.com/" />
+    <meta property="og:title" content="E-Bikes Africa - Sustainable Electric Bikes for African Roads" />
+    <meta property="og:description" content="Leading the electric mobility revolution across Africa with high-quality, sustainable e-bikes designed for African roads. Join the green movement today!" />
+    <meta property="og:image" content="https://ebikesafrica.com/images/og-image.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://ebikesafrica.com/" />
+    <meta property="twitter:title" content="E-Bikes Africa - Sustainable Electric Bikes for African Roads" />
+    <meta property="twitter:description" content="Leading the electric mobility revolution across Africa with high-quality, sustainable e-bikes designed for African roads. Join the green movement today!" />
+    <meta property="twitter:image" content="https://ebikesafrica.com/images/twitter-image.jpg" />
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#22c55e" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    
+    <!-- Critical CSS for faster loading -->
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: #ffffff;
+        color: #1f2937;
+        line-height: 1.6;
+      }
+      
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Loading spinner styles */
+      .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #ffffff;
+        flex-direction: column;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #22c55e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        margin-top: 1rem;
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      /* Hide loading spinner when app loads */
+      .app-loaded .loading-spinner {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div class="loading-spinner" id="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading E-Bikes Africa...</div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div id="root"></div>
+    
+    <!-- Scripts -->
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Remove loading screen when app loads -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        const loading = document.getElementById('loading');
+        
+        // Hide loading screen after app loads
+        setTimeout(() => {
+          if (loading) {
+            loading.style.display = 'none';
+          }
+          document.body.classList.add('app-loaded');
+        }, 800);
+      });
+    </script>
+    
+    <!-- No JavaScript fallback -->
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
+        <h1>E-Bikes Africa</h1>
+        <p>This website requires JavaScript to function properly. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
+  </body>
+</html>

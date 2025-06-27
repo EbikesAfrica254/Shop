@@ -1,0 +1,27 @@
+/* src/styles/components/buttons.css - EXTRACT BUTTON STYLES */
+
+.hero-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 700;
+  font-size: 1.125rem;
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: all var(--transition-bounce);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.hero-button.primary {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-dark));
+  color: white;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}
+
+/* ... rest of button styles ... */

@@ -1,0 +1,489 @@
+/* src/styles/pages/services/bike-servicing.css */
+
+.bike-servicing-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Hero Section */
+.servicing-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 50%, #f0fdf4 100%);
+  padding-top: 5rem;
+}
+
+.servicing-hero-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+}
+
+.servicing-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .servicing-hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.servicing-hero-content {
+  transform: translateX(-20px);
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.servicing-hero-content.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.servicing-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #d1fae5;
+  border-radius: 50px;
+  margin-bottom: 1.5rem;
+}
+
+.servicing-hero-badge-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #059669;
+  margin-right: 0.5rem;
+}
+
+.servicing-hero-badge-text {
+  color: #047857;
+  font-weight: 600;
+}
+
+.servicing-hero-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+@media (min-width: 1024px) {
+  .servicing-hero-title {
+    font-size: 3.75rem;
+  }
+}
+
+.servicing-hero-title-accent {
+  display: block;
+  color: #059669;
+}
+
+.servicing-hero-description {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.servicing-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.servicing-hero-cta-primary {
+  background: #059669;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.servicing-hero-cta-primary:hover {
+  background: #047857;
+}
+
+.servicing-hero-cta-secondary {
+  border: 2px solid #059669;
+  color: #059669;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.servicing-hero-cta-secondary:hover {
+  background: #ecfdf5;
+}
+
+.servicing-hero-cta-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.servicing-hero-image {
+  transform: translateX(20px);
+  opacity: 0;
+  transition: all 1s ease 0.3s;
+}
+
+.servicing-hero-image.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.servicing-hero-img {
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  height: auto;
+}
+
+/* Service Packages Section */
+.servicing-packages-section {
+  padding: 5rem 0;
+  background: #f9fafb;
+}
+
+.servicing-packages-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.servicing-packages-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.servicing-packages-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.servicing-packages-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.servicing-packages-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .servicing-packages-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.servicing-package-card {
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.servicing-package-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-0.5rem);
+}
+
+.servicing-package-card.popular {
+  border: 2px solid #059669;
+}
+
+.servicing-package-popular-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #059669;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: 600;
+}
+
+.servicing-package-image-wrapper {
+  position: relative;
+  height: 12rem;
+  overflow: hidden;
+}
+
+.servicing-package-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.servicing-package-price-overlay {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  color: white;
+}
+
+.servicing-package-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.servicing-package-duration {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.servicing-package-content {
+  padding: 1.5rem;
+}
+
+.servicing-package-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.servicing-package-description {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.servicing-package-services {
+  margin-bottom: 1.5rem;
+}
+
+.servicing-service {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.servicing-service-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #059669;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.servicing-service-text {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.servicing-package-cta {
+  width: 100%;
+  background: #059669;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.servicing-package-cta:hover {
+  background: #047857;
+}
+
+/* Testimonials Section */
+.servicing-testimonials-section {
+  padding: 5rem 0;
+}
+
+.servicing-testimonials-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.servicing-testimonials-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.servicing-testimonials-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.servicing-testimonials-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .servicing-testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.servicing-testimonial-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.servicing-testimonial-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.servicing-testimonial-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.servicing-testimonial-info {
+  flex: 1;
+}
+
+.servicing-testimonial-name {
+  font-weight: 700;
+  color: #111827;
+}
+
+.servicing-testimonial-location {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.servicing-testimonial-rating {
+  display: flex;
+  margin-left: auto;
+}
+
+.servicing-testimonial-star {
+  width: 1rem;
+  height: 1rem;
+  color: #fbbf24;
+  fill: currentColor;
+}
+
+.servicing-testimonial-comment {
+  color: #374151;
+  font-style: italic;
+}
+
+/* CTA Section */
+.servicing-cta-section {
+  padding: 5rem 0;
+  background: #059669;
+  color: white;
+}
+
+.servicing-cta-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.servicing-cta-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+}
+
+.servicing-cta-description {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.servicing-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.servicing-cta-primary {
+  background: white;
+  color: #059669;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.servicing-cta-primary:hover {
+  background: #f3f4f6;
+}
+
+.servicing-cta-secondary {
+  border: 2px solid white;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.servicing-cta-secondary:hover {
+  background: white;
+  color: #059669;
+}
+
+.servicing-cta-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .servicing-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .servicing-packages-title,
+  .servicing-testimonials-title,
+  .servicing-cta-title {
+    font-size: 2rem;
+  }
+  
+  .servicing-cta-actions {
+    flex-direction: column;
+  }
+  
+  .servicing-cta-primary,
+  .servicing-cta-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

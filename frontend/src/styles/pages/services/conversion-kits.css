@@ -1,0 +1,578 @@
+/* src/styles/pages/services/conversion-kits.css */
+
+.conversion-kits-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Hero Section */
+.conversion-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fdf4ff 0%, #ffffff 50%, #fce7f3 100%);
+  padding-top: 5rem;
+}
+
+.conversion-hero-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+}
+
+.conversion-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .conversion-hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.conversion-hero-content {
+  transform: translateX(-20px);
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.conversion-hero-content.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.conversion-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #f3e8ff;
+  border-radius: 50px;
+  margin-bottom: 1.5rem;
+}
+
+.conversion-hero-badge-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #7c3aed;
+  margin-right: 0.5rem;
+}
+
+.conversion-hero-badge-text {
+  color: #6b21a8;
+  font-weight: 600;
+}
+
+.conversion-hero-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+@media (min-width: 1024px) {
+  .conversion-hero-title {
+    font-size: 3.75rem;
+  }
+}
+
+.conversion-hero-title-accent {
+  display: block;
+  color: #7c3aed;
+}
+
+.conversion-hero-description {
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.conversion-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.conversion-hero-cta-primary {
+  background: #7c3aed;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.conversion-hero-cta-primary:hover {
+  background: #6d28d9;
+}
+
+.conversion-hero-cta-secondary {
+  border: 2px solid #7c3aed;
+  color: #7c3aed;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.conversion-hero-cta-secondary:hover {
+  background: #faf5ff;
+}
+
+.conversion-hero-image {
+  transform: translateX(20px);
+  opacity: 0;
+  transition: all 1s ease 0.3s;
+}
+
+.conversion-hero-image.visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.conversion-hero-img {
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  height: auto;
+}
+
+/* Conversion Kits Section */
+.conversion-kits-section {
+  padding: 5rem 0;
+  background: #f9fafb;
+}
+
+.conversion-kits-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.conversion-kits-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.conversion-kits-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.conversion-kits-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.conversion-kits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .conversion-kits-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.conversion-kit-card {
+  position: relative;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.conversion-kit-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-0.5rem);
+}
+
+.conversion-kit-card.popular {
+  border: 2px solid #7c3aed;
+}
+
+.conversion-kit-popular-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #7c3aed;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  font-weight: 600;
+}
+
+.conversion-kit-image-wrapper {
+  position: relative;
+  height: 12rem;
+  overflow: hidden;
+}
+
+.conversion-kit-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.conversion-kit-price-overlay {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  color: white;
+}
+
+.conversion-kit-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.conversion-kit-installation {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.conversion-kit-content {
+  padding: 1.5rem;
+}
+
+.conversion-kit-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.conversion-kit-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.conversion-spec-label {
+  color: #6b7280;
+}
+
+.conversion-spec-value {
+  font-weight: 600;
+}
+
+.conversion-kit-components {
+  margin-bottom: 1.5rem;
+}
+
+.conversion-component {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.conversion-component-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #7c3aed;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.conversion-component-text {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.conversion-kit-cta {
+  width: 100%;
+  background: #7c3aed;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.conversion-kit-cta:hover {
+  background: #6d28d9;
+}
+
+/* Compatible Bikes Section */
+.compatible-bikes-section {
+  padding: 5rem 0;
+}
+
+.compatible-bikes-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.compatible-bikes-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.compatible-bikes-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.compatible-bikes-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.compatible-bikes-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .compatible-bikes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .compatible-bikes-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.compatible-bike-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.compatible-bike-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.compatible-bike-image {
+  width: 100%;
+  height: 10rem;
+  object-fit: cover;
+}
+
+.compatible-bike-content {
+  padding: 1rem;
+}
+
+.compatible-bike-type {
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.compatible-bike-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.compatible-bike-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.compatible-bike-badge.excellent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.compatible-bike-badge.good {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Conversion Process Section */
+.conversion-process-section {
+  padding: 5rem 0;
+  background: #f9fafb;
+}
+
+.conversion-process-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.conversion-process-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.conversion-process-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.conversion-process-subtitle {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.conversion-process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.conversion-process-step {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.conversion-step-number {
+  background: #7c3aed;
+  color: white;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+}
+
+.conversion-step-content {
+  flex: 1;
+}
+
+.conversion-step-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.conversion-step-description {
+  color: #6b7280;
+}
+
+.conversion-step-duration {
+  color: #7c3aed;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* CTA Section */
+.conversion-cta-section {
+  padding: 5rem 0;
+  background: #7c3aed;
+  color: white;
+}
+
+.conversion-cta-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  text-align: center;
+}
+
+.conversion-cta-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+}
+
+.conversion-cta-description {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.conversion-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.conversion-cta-primary {
+  background: white;
+  color: #7c3aed;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.conversion-cta-primary:hover {
+  background: #f3f4f6;
+}
+
+.conversion-cta-secondary {
+  border: 2px solid white;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.conversion-cta-secondary:hover {
+  background: white;
+  color: #7c3aed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .conversion-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .conversion-kits-title,
+  .compatible-bikes-title,
+  .conversion-process-title,
+  .conversion-cta-title {
+    font-size: 2rem;
+  }
+  
+  .conversion-process-step {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .conversion-cta-actions {
+    flex-direction: column;
+  }
+  
+  .conversion-cta-primary,
+  .conversion-cta-secondary {
+    width: 100%;
+    text-align: center;
+  }
+}
