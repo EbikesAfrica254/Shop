@@ -1,7 +1,9 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-dotenv.config();
+// Load environment-specific config file
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: envFile });
 
 const { DB_HOST, DB_USER, DB_PASS, DB_NAME } = process.env;
 
@@ -39,7 +41,7 @@ export async function initDB() {
                       NOT NULL DEFAULT 'pending',
         suspended     TINYINT(1) NOT NULL DEFAULT 0,
         created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // items
@@ -59,7 +61,7 @@ export async function initDB() {
         created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         share_link      VARCHAR(255),
         INDEX idx_cat_name (category, name)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // item_images
@@ -70,7 +72,7 @@ export async function initDB() {
         file_name VARCHAR(100) NOT NULL,
         INDEX idx_item (item_id),
         FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // users
@@ -102,7 +104,32 @@ export async function initDB() {
         INDEX idx_verification_token (verification_token),
         INDEX idx_reset_token (reset_token),
         INDEX idx_password_setup_token (password_setup_token)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+
+    // ✅ CRITICAL: temp_orders table (MUST be created BEFORE orders table due to foreign key in orders)
+    await root.query(`
+      CREATE TABLE IF NOT EXISTS temp_orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        temp_ref VARCHAR(100) UNIQUE NOT NULL,
+        customer_data JSON NOT NULL,
+        delivery_data JSON NOT NULL,
+        payment_data JSON NOT NULL,
+        items_data JSON NOT NULL,
+        notes TEXT,
+        calculated_total DECIMAL(10,2) NOT NULL,
+        payment_required DECIMAL(10,2) NOT NULL,
+        status ENUM('pending_payment', 'payment_initiated', 'awaiting_bank_transfer', 'completed', 'expired') DEFAULT 'pending_payment',
+        checkout_request_id VARCHAR(255),
+        bank_transfer_ref VARCHAR(255),
+        final_order_id INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+        INDEX idx_temp_ref (temp_ref),
+        INDEX idx_checkout_request (checkout_request_id),
+        INDEX idx_status (status),
+        INDEX idx_expires_at (expires_at)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // Enhanced orders table with all required fields
@@ -110,6 +137,7 @@ export async function initDB() {
       CREATE TABLE IF NOT EXISTS orders (
         id INT AUTO_INCREMENT PRIMARY KEY,
         order_number VARCHAR(50) UNIQUE NOT NULL,
+        temp_order_ref VARCHAR(100),                    -- ✅ Add reference to temp_orders
         user_id INT,
         customer_name VARCHAR(255) NOT NULL,
         customer_email VARCHAR(255),
@@ -136,13 +164,15 @@ export async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+        FOREIGN KEY (temp_order_ref) REFERENCES temp_orders(temp_ref) ON DELETE SET NULL,  -- ✅ Add foreign key
         INDEX idx_order_number (order_number),
+        INDEX idx_temp_order_ref (temp_order_ref),      -- ✅ Add index
         INDEX idx_user_id (user_id),
         INDEX idx_order_status (order_status),
         INDEX idx_payment_status (payment_status),
         INDEX idx_customer_email (customer_email),
         INDEX idx_created_at (created_at)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // Enhanced order_items table
@@ -163,7 +193,7 @@ export async function initDB() {
         FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE RESTRICT,
         INDEX idx_order_id (order_id),
         INDEX idx_item_id (item_id)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // Separate delivery_locations table for detailed location data
@@ -180,14 +210,15 @@ export async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
         INDEX idx_order_id (order_id)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // Enhanced mpesa_transactions table
+    // ✅ UPDATED: Enhanced mpesa_transactions table with temp_order_ref support
     await root.query(`
       CREATE TABLE IF NOT EXISTS mpesa_transactions (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        order_id INT,
+        order_id INT,                                   -- Keep for backward compatibility
+        temp_order_ref VARCHAR(100),                   -- ✅ Add support for temp orders
         merchant_request_id VARCHAR(255),
         checkout_request_id VARCHAR(255),
         response_code VARCHAR(10),
@@ -210,20 +241,23 @@ export async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL,
+        FOREIGN KEY (temp_order_ref) REFERENCES temp_orders(temp_ref) ON DELETE SET NULL,  -- ✅ Add foreign key
         UNIQUE KEY unique_checkout_request (checkout_request_id),
         INDEX idx_order_id (order_id),
+        INDEX idx_temp_order_ref (temp_order_ref),      -- ✅ Add index for temp orders
         INDEX idx_checkout_request_id (checkout_request_id),
         INDEX idx_mpesa_receipt_number (mpesa_receipt_number),
         INDEX idx_phone_number (phone_number),
         INDEX idx_status (status)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
-    // Enhanced bank_transfers table
+    // ✅ UPDATED: Enhanced bank_transfers table with temp_order_ref support
     await root.query(`
       CREATE TABLE IF NOT EXISTS bank_transfers (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        order_id INT NOT NULL,
+        order_id INT,                                   -- Make nullable for temp orders
+        temp_order_ref VARCHAR(100),                   -- ✅ Add support for temp orders
         reference_number VARCHAR(255) UNIQUE NOT NULL,
         bank_name VARCHAR(255),
         account_number VARCHAR(255),
@@ -240,12 +274,14 @@ export async function initDB() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+        FOREIGN KEY (temp_order_ref) REFERENCES temp_orders(temp_ref) ON DELETE CASCADE,  -- ✅ Add foreign key
         FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL,
         INDEX idx_order_id (order_id),
+        INDEX idx_temp_order_ref (temp_order_ref),      -- ✅ Add index for temp orders
         INDEX idx_reference_number (reference_number),
         INDEX idx_status (status),
         INDEX idx_verified (verified)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     // Enhanced payment_receipts table
@@ -267,7 +303,7 @@ export async function initDB() {
         INDEX idx_order_id (order_id),
         INDEX idx_receipt_number (receipt_number),
         INDEX idx_payment_type (payment_type)
-      );
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `);
 
     console.log('✅ All database tables created successfully');
@@ -281,8 +317,6 @@ export async function initDB() {
       database: DB_NAME,
       waitForConnections: true,
       connectionLimit: 10,
-      acquireTimeout: 60000,
-      timeout: 60000,
     });
 
     console.log('✅ Database pool created successfully');
@@ -328,5 +362,53 @@ export async function getTableInfo() {
     return tableInfo;
   } catch (error) {
     throw error;
+  }
+}
+
+// ✅ UPDATED: Helper function to verify all payment tables exist (including temp_orders)
+export async function verifyPaymentTables() {
+  try {
+    const requiredTables = [
+      'temp_orders',           // ✅ Add temp_orders to verification
+      'orders',
+      'order_items', 
+      'delivery_locations',
+      'mpesa_transactions',
+      'bank_transfers',
+      'payment_receipts'
+    ];
+    
+    const results = {};
+    
+    for (const table of requiredTables) {
+      try {
+        const [rows] = await db.query(`SELECT COUNT(*) as count FROM ${table}`);
+        results[table] = { exists: true, count: rows[0].count };
+      } catch (error) {
+        results[table] = { exists: false, error: error.message };
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    throw error;
+  }
+}
+
+// ✅ NEW: Helper function to clean up expired temp orders
+export async function cleanupExpiredTempOrders() {
+  try {
+    const [result] = await db.query(
+      'DELETE FROM temp_orders WHERE expires_at < NOW() AND status NOT IN ("completed")'
+    );
+    
+    if (result.affectedRows > 0) {
+      console.log(`🧹 Cleaned up ${result.affectedRows} expired temporary orders`);
+    }
+    
+    return { cleaned: result.affectedRows };
+  } catch (error) {
+    console.error('❌ Failed to cleanup expired temp orders:', error);
+    return { cleaned: 0, error: error.message };
   }
 }

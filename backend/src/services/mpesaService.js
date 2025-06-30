@@ -90,33 +90,32 @@ class MPesaService {
   }
 
   async initiateSTKPush(orderData) {
-  try {
-    console.log('📱 Initiating M-Pesa STK push...');
-    
-    const { tempOrderRef, phoneNumber, amount, accountReference, transactionDesc } = orderData;
-    
-    if (!tempOrderRef || !phoneNumber || !amount) {
-      throw new Error('Missing required fields: tempOrderRef, phoneNumber, amount');
-    }
+    try {
+      console.log('📱 Initiating M-Pesa STK push...');
+      
+      const { tempOrderRef, phoneNumber, amount, accountReference, transactionDesc } = orderData;
+      
+      if (!tempOrderRef || !phoneNumber || !amount) {
+        throw new Error('Missing required fields: tempOrderRef, phoneNumber, amount');
+      }
 
-    const formattedPhone = this.formatPhoneNumber(phoneNumber);
-    const accessToken = await this.getAccessToken();
-    const { password, timestamp } = this.generatePassword();
+      const formattedPhone = this.formatPhoneNumber(phoneNumber);
+      const accessToken = await this.getAccessToken();
+      const { password, timestamp } = this.generatePassword();
 
-    const stkPushData = {
-      BusinessShortCode: this.businessShortCode,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: 'CustomerPayBillOnline',
-      Amount: Math.round(parseFloat(amount)),
-      PartyA: formattedPhone,
-      PartyB: this.businessShortCode,
-      PhoneNumber: formattedPhone,
-      CallBackURL: this.callbackUrl,
-      AccountReference: accountReference || tempOrderRef, // Use temp ref
-      TransactionDesc: transactionDesc || `E-Bikes Payment - ${tempOrderRef}`
-    };
-
+      const stkPushData = {
+        BusinessShortCode: this.businessShortCode,
+        Password: password,
+        Timestamp: timestamp,
+        TransactionType: 'CustomerPayBillOnline',
+        Amount: Math.round(parseFloat(amount)),
+        PartyA: formattedPhone,
+        PartyB: this.businessShortCode,
+        PhoneNumber: formattedPhone,
+        CallBackURL: this.callbackUrl,
+        AccountReference: accountReference || tempOrderRef,
+        TransactionDesc: transactionDesc || `E-Bikes Payment - ${tempOrderRef}`
+      };
 
       console.log('📤 Sending STK push request:', {
         ...stkPushData,
@@ -132,8 +131,9 @@ class MPesaService {
 
       console.log('📥 STK push response:', response.data);
 
+      // ✅ FIXED: Store transaction record
       const transactionData = {
-        order_id: orderId,
+        temp_order_ref: tempOrderRef,
         merchant_request_id: response.data.MerchantRequestID,
         checkout_request_id: response.data.CheckoutRequestID,
         response_code: response.data.ResponseCode,
@@ -170,19 +170,41 @@ class MPesaService {
         return {
           success: false,
           message: response.data.ResponseDescription || 'STK push failed',
+          errorCode: response.data.ResponseCode,
           data: response.data
         };
       }
 
     } catch (error) {
       console.error('💥 STK push error:', error.response?.data || error.message);
-      throw new Error(`STK push failed: ${error.response?.data?.errorMessage || error.message}`);
+      
+      // ✅ ENHANCED: Better error handling with specific messages
+      let errorMessage = 'STK push failed';
+      
+      if (error.response?.data) {
+        const errorData = error.response.data;
+        if (errorData.errorMessage) {
+          errorMessage = errorData.errorMessage;
+        } else if (errorData.ResponseDescription) {
+          errorMessage = errorData.ResponseDescription;
+        }
+      } else if (error.message.includes('phone')) {
+        errorMessage = 'Invalid phone number format';
+      } else if (error.message.includes('network') || error.code === 'ECONNREFUSED') {
+        errorMessage = 'Network error. Please check your connection and try again';
+      }
+      
+      return {
+        success: false,
+        message: errorMessage,
+        error: error.message
+      };
     }
   }
 
   async querySTKPushStatus(checkoutRequestId) {
     try {
-      console.log('🔍 Querying STK push status...');
+      console.log('🔍 Querying M-Pesa STK push status for:', checkoutRequestId);
       
       const accessToken = await this.getAccessToken();
       const { password, timestamp } = this.generatePassword();
@@ -194,6 +216,8 @@ class MPesaService {
         CheckoutRequestID: checkoutRequestId
       };
 
+      console.log('📤 Sending STK query request:', queryData);
+
       const response = await axios.post(this.queryUrl, queryData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -203,21 +227,79 @@ class MPesaService {
 
       console.log('📥 STK query response:', response.data);
 
-      await db.query(
-        `UPDATE mpesa_transactions 
-         SET result_code = ?, result_desc = ?, updated_at = NOW() 
-         WHERE checkout_request_id = ?`,
-        [response.data.ResultCode, response.data.ResultDesc, checkoutRequestId]
-      );
+      // ✅ HANDLE INITIATOR ERROR: Code 2001 means query not available
+      if (response.data.ResultCode === '2001') {
+        console.log('⚠️ M-Pesa query not available (initiator credentials needed)');
+        
+        // Don't update status, just return that query is not available
+        return {
+          success: false,
+          status: 'query_not_available',
+          message: 'M-Pesa status query not available in sandbox mode',
+          data: response.data
+        };
+      }
+
+      // Process other response codes as before
+      let status = 'pending';
+      let resultDesc = response.data.ResultDesc || 'Query completed';
+      
+      if (response.data.ResultCode === '0') {
+        status = 'success';
+        
+        await db.query(
+          `UPDATE mpesa_transactions 
+          SET status = 'success', 
+              result_code = ?, 
+              result_desc = ?, 
+              callback_received = true,
+              updated_at = NOW() 
+          WHERE checkout_request_id = ?`,
+          [response.data.ResultCode, resultDesc, checkoutRequestId]
+        );
+        
+      } else if (response.data.ResultCode === '1032') {
+        status = 'cancelled';
+        resultDesc = 'Payment cancelled by user';
+        
+        await db.query(
+          `UPDATE mpesa_transactions 
+          SET status = 'cancelled', 
+              result_code = ?, 
+              result_desc = ?, 
+              updated_at = NOW() 
+          WHERE checkout_request_id = ?`,
+          [response.data.ResultCode, resultDesc, checkoutRequestId]
+        );
+        
+      } else if (['1', '1001', '1019'].includes(response.data.ResultCode)) {
+        status = 'failed';
+        
+        await db.query(
+          `UPDATE mpesa_transactions 
+          SET status = 'failed', 
+              result_code = ?, 
+              result_desc = ?, 
+              updated_at = NOW() 
+          WHERE checkout_request_id = ?`,
+          [response.data.ResultCode, resultDesc, checkoutRequestId]
+        );
+      }
 
       return {
         success: true,
+        status: status,
         data: response.data
       };
 
     } catch (error) {
       console.error('💥 STK query error:', error.response?.data || error.message);
-      throw new Error(`STK query failed: ${error.response?.data?.errorMessage || error.message}`);
+      
+      return {
+        success: false,
+        status: 'error',
+        message: error.response?.data?.errorMessage || error.message
+      };
     }
   }
 

@@ -245,60 +245,123 @@ export const checkPaymentStatus = async (req, res) => {
     if (tempOrders.length === 0) {
       return res.status(404).json({
         success: false,
+        status: 'not_found',
         message: 'Order reference not found'
       });
     }
 
     const tempOrder = tempOrders[0];
 
-    // Check if order was already created
+    // Check if order was already created (payment completed)
     if (tempOrder.final_order_id) {
       return res.json({
+        success: true,
         status: 'completed',
         orderId: tempOrder.final_order_id,
-        message: 'Payment completed and order created'
+        message: 'Payment completed and order created successfully'
       });
     }
 
     // Check M-Pesa transaction if exists
     if (tempOrder.checkout_request_id) {
       const [mpesaTransactions] = await db.query(
-        'SELECT * FROM mpesa_transactions WHERE checkout_request_id = ?',
+        'SELECT * FROM mpesa_transactions WHERE checkout_request_id = ? ORDER BY created_at DESC LIMIT 1',
         [tempOrder.checkout_request_id]
       );
 
       if (mpesaTransactions.length > 0) {
         const transaction = mpesaTransactions[0];
         
+        console.log('📱 M-Pesa transaction status:', transaction.status);
+        
         if (transaction.status === 'success') {
-          // Create final order if payment successful
-          if (!tempOrder.final_order_id) {
-            const orderId = await createFinalOrder(tempOrder, transaction);
-            
-            await db.query(
-              'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
-              [orderId, tempOrderRef]
-            );
+          // Create final order if payment successful and not already created
+          const orderId = await createFinalOrder(tempOrder, transaction);
+          
+          await db.query(
+            'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
+            [orderId, tempOrderRef]
+          );
 
-            return res.json({
-              status: 'completed',
-              orderId: orderId,
-              transactionId: transaction.mpesa_receipt_number,
-              message: 'Payment successful'
-            });
-          }
+          return res.json({
+            success: true,
+            status: 'completed',
+            orderId: orderId,
+            transactionId: transaction.mpesa_receipt_number,
+            amount: transaction.amount,
+            message: 'Payment successful! Your order has been confirmed.'
+          });
+          
         } else if (transaction.status === 'failed') {
           return res.json({
+            success: false,
             status: 'failed',
-            message: transaction.result_desc || 'Payment failed'
+            message: transaction.result_desc || 'Payment failed. Please try again.',
+            errorCode: transaction.result_code,
+            canRetry: true
           });
+          
+        } else if (transaction.status === 'cancelled') {
+          return res.json({
+            success: false,
+            status: 'cancelled', 
+            message: 'Payment was cancelled by user',
+            canRetry: true
+          });
+          
         } else {
-          // Still pending - query M-Pesa for updates
-          await mpesaService.querySTKPushStatus(tempOrder.checkout_request_id);
+          // Still pending - check if we should query M-Pesa for updates
+          const timeSinceCreated = Date.now() - new Date(transaction.created_at).getTime();
+          
+          if (timeSinceCreated > 2 * 60 * 1000) { // 2 minutes
+            // Query M-Pesa for status update
+            try {
+              await mpesaService.querySTKPushStatus(tempOrder.checkout_request_id);
+              
+              // Re-fetch transaction after query
+              const [updatedTransactions] = await db.query(
+                'SELECT * FROM mpesa_transactions WHERE checkout_request_id = ?',
+                [tempOrder.checkout_request_id]
+              );
+              
+              if (updatedTransactions.length > 0) {
+                const updatedTransaction = updatedTransactions[0];
+                
+                if (updatedTransaction.status === 'success') {
+                  const orderId = await createFinalOrder(tempOrder, updatedTransaction);
+                  
+                  await db.query(
+                    'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
+                    [orderId, tempOrderRef]
+                  );
+
+                  return res.json({
+                    success: true,
+                    status: 'completed',
+                    orderId: orderId,
+                    transactionId: updatedTransaction.mpesa_receipt_number,
+                    message: 'Payment successful! Your order has been confirmed.'
+                  });
+                  
+                } else if (updatedTransaction.status === 'failed') {
+                  return res.json({
+                    success: false,
+                    status: 'failed',
+                    message: updatedTransaction.result_desc || 'Payment failed',
+                    canRetry: true
+                  });
+                }
+              }
+            } catch (queryError) {
+              console.error('❌ M-Pesa query error:', queryError);
+            }
+          }
           
           return res.json({
+            success: true,
             status: 'pending',
-            message: 'Payment is being processed'
+            message: 'Payment is being processed. Please wait...',
+            timeRemaining: Math.max(0, (5 * 60 * 1000) - timeSinceCreated) // 5 minute timeout
           });
         }
       }
@@ -315,46 +378,66 @@ export const checkPaymentStatus = async (req, res) => {
         const transfer = bankTransfers[0];
         
         if (transfer.status === 'verified') {
-          // Create final order if bank transfer verified
-          if (!tempOrder.final_order_id) {
-            const orderId = await createFinalOrder(tempOrder, transfer);
-            
-            await db.query(
-              'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
-              [orderId, tempOrderRef]
-            );
+          const orderId = await createFinalOrder(tempOrder, transfer);
+          
+          await db.query(
+            'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
+            [orderId, tempOrderRef]
+          );
 
-            return res.json({
-              status: 'completed',
-              orderId: orderId,
-              message: 'Bank transfer verified and order created'
-            });
-          }
+          return res.json({
+            success: true,
+            status: 'completed',
+            orderId: orderId,
+            message: 'Bank transfer verified and order created successfully'
+          });
+          
         } else if (transfer.status === 'rejected') {
           return res.json({
+            success: false,
             status: 'failed',
-            message: 'Bank transfer was rejected'
+            message: transfer.rejection_reason || 'Bank transfer was rejected',
+            canRetry: true
           });
+          
         } else {
           return res.json({
+            success: true,
             status: 'pending_verification',
-            message: 'Bank transfer is being verified'
+            message: 'Bank transfer is being verified. You will receive confirmation once approved.'
           });
         }
       }
     }
 
+    // Check if temp order has expired
+    if (new Date() > new Date(tempOrder.expires_at)) {
+      await db.query(
+        'UPDATE temp_orders SET status = "expired" WHERE temp_ref = ?',
+        [tempOrderRef]
+      );
+      
+      return res.json({
+        success: false,
+        status: 'expired',
+        message: 'Order has expired. Please create a new order.',
+        canRetry: false
+      });
+    }
+
     // Default response for pending payments
-    res.json({
+    return res.json({
+      success: true,
       status: 'pending',
-      message: 'Payment is being processed'
+      message: 'Waiting for payment initiation...'
     });
 
   } catch (error) {
     console.error('❌ Payment status check failed:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to check payment status',
+      status: 'error',
+      message: 'Failed to check payment status. Please try again.',
       error: error.message
     });
   }
@@ -367,19 +450,22 @@ export const checkPaymentStatus = async (req, res) => {
 export const mpesaCallback = async (req, res) => {
   try {
     console.log('📞 M-Pesa callback received');
+    console.log('📥 Callback data:', JSON.stringify(req.body, null, 2));
     
     const result = await mpesaService.processCallback(req.body);
     
-    if (result.success && result.data.status === 'success') {
-      // Get the transaction to find temp order
-      const checkoutRequestId = req.body.Body.stkCallback.CheckoutRequestID;
+    if (result.success) {
+      const { Body } = req.body;
+      const { stkCallback } = Body;
+      const checkoutRequestId = stkCallback.CheckoutRequestID;
       
+      // Find temp order and notify if needed
       const [tempOrders] = await db.query(
         'SELECT * FROM temp_orders WHERE checkout_request_id = ?',
         [checkoutRequestId]
       );
 
-      if (tempOrders.length > 0) {
+      if (tempOrders.length > 0 && result.data.status === 'success') {
         const tempOrder = tempOrders[0];
         
         // Create final order
@@ -396,6 +482,8 @@ export const mpesaCallback = async (req, res) => {
             'UPDATE temp_orders SET final_order_id = ?, status = "completed" WHERE temp_ref = ?',
             [orderId, tempOrder.temp_ref]
           );
+          
+          console.log('✅ Order created successfully from M-Pesa callback:', orderId);
         }
       }
     }

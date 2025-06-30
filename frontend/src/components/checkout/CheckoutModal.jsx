@@ -165,8 +165,8 @@ const initiateBankTransfer = async (transferData) => {
   return data;
 };
 
-const checkPaymentStatus = async (orderId, paymentId) => {
-  const data = await apiRequest(`${API_BASE_URL}/payments/status/${orderId}/${paymentId}`, {  // Update path
+const checkPaymentStatus = async (tempOrderRef) => {
+  const data = await apiRequest(`${API_BASE_URL}/payments/status/${tempOrderRef}`, {
     method: 'GET',
   });
   return data;
@@ -713,6 +713,7 @@ const PaymentProcessor = memo(({
 
   const formatCurrencyFallback = formatCurrency || ((amount) => `KSH ${amount?.toFixed?.(2) || 0}`);
 
+// Fix the initiateMpesaPayment function call
   const handleMpesaPayment = async () => {
     if (!mpesaPhone || mpesaPhone.length !== 12) {
       onPaymentError('Please enter a valid M-Pesa phone number');
@@ -724,13 +725,16 @@ const PaymentProcessor = memo(({
     setStatusMessage('Initiating M-Pesa payment...');
 
     try {
+      // ✅ FIXED: Use the correct data structure expected by backend
       const paymentData = {
-        orderId: orderData.orderId,
-        amount: orderData.amount,
+        tempOrderRef: orderData.tempOrderRef,    // ✅ This is key!
         phoneNumber: mpesaPhone,
-        accountReference: `ORDER-${orderData.orderId}`,
-        transactionDesc: `E-Bikes Order Payment - ${orderData.orderId}`
+        amount: orderData.amount,
+        accountReference: `ORDER-${orderData.tempOrderRef}`,
+        transactionDesc: `E-Bikes Order Payment - ${orderData.tempOrderRef}`
       };
+
+      console.log('🚀 Sending M-Pesa payment data:', paymentData); // ✅ Add logging
 
       const response = await initiateMpesaPayment(paymentData);
 
@@ -740,7 +744,7 @@ const PaymentProcessor = memo(({
         setStatusMessage('Check your phone for M-Pesa prompt and enter your PIN...');
 
         // Start polling for payment status
-        pollPaymentStatus(orderData.orderId, response.checkoutRequestId);
+        pollPaymentStatus(orderData.tempOrderRef, response.checkoutRequestId); // ✅ Use tempOrderRef
       } else {
         throw new Error(response.message || 'Failed to initiate M-Pesa payment');
       }
@@ -824,49 +828,96 @@ const PaymentProcessor = memo(({
     }
   };
 
-  const pollPaymentStatus = async (orderId, paymentId) => {
-    const maxAttempts = 30; // 30 attempts = 2.5 minutes
+  const pollPaymentStatus = async (tempOrderRef, paymentId) => {
+    const maxAttempts = 60; // 5 minutes (60 * 5 seconds)
     let attempts = 0;
 
     const poll = async () => {
       try {
         attempts++;
-        const response = await checkPaymentStatus(orderId, paymentId);
+        console.log(`🔍 Checking payment status (attempt ${attempts}/${maxAttempts})`);
+        
+        const response = await checkPaymentStatus(tempOrderRef);
+        
+        console.log('📊 Payment status response:', response);
 
         if (response.status === 'completed') {
           setPaymentStatus('completed');
-          setStatusMessage('Payment successful!');
+          setStatusMessage('🎉 Payment successful! Your order has been confirmed.');
           setIsProcessing(false);
-          onPaymentSuccess(response);
-        } else if (response.status === 'failed' || response.status === 'cancelled') {
+          onPaymentSuccess({
+            orderId: response.orderId,
+            transactionId: response.transactionId,
+            amount: response.amount,
+            method: 'mpesa'
+          });
+          
+        } else if (response.status === 'failed') {
           setPaymentStatus('failed');
-          setStatusMessage(response.message || 'Payment failed');
+          setStatusMessage(`❌ ${response.message}`);
           setIsProcessing(false);
-          onPaymentError(response.message || 'Payment failed');
-        } else if (attempts >= maxAttempts) {
-          setPaymentStatus('timeout');
-          setStatusMessage('Payment verification timed out. Please contact support.');
+          onPaymentError(response.message);
+          
+        } else if (response.status === 'cancelled') {
+          setPaymentStatus('failed');
+          setStatusMessage('❌ Payment was cancelled. Please try again.');
           setIsProcessing(false);
-          onPaymentError('Payment verification timed out');
+          onPaymentError('Payment cancelled');
+          
+        } else if (response.status === 'expired') {
+          setPaymentStatus('failed');
+          setStatusMessage('⏰ Payment session expired. Please create a new order.');
+          setIsProcessing(false);
+          onPaymentError('Session expired');
+          
+        } else if (response.status === 'pending') {
+          if (attempts >= maxAttempts) {
+            setPaymentStatus('timeout');
+            setStatusMessage('⏰ Payment verification timed out. Please contact support if payment was deducted.');
+            setIsProcessing(false);
+            onPaymentError('Verification timeout');
+          } else {
+            // Update status message with helpful info
+            const timeRemaining = response.timeRemaining ? Math.ceil(response.timeRemaining / 1000) : null;
+            if (timeRemaining && timeRemaining > 0) {
+              setStatusMessage(`⏳ ${response.message} (${timeRemaining}s remaining)`);
+            } else {
+              setStatusMessage(response.message);
+            }
+            
+            // Continue polling
+            setTimeout(poll, 5000);
+          }
+          
         } else {
-          // Continue polling
-          setTimeout(poll, 5000); // Poll every 5 seconds
-       }
-     } catch (error) {
-       console.error('Error checking payment status:', error);
-       if (attempts >= maxAttempts) {
-         setPaymentStatus('failed');
-         setStatusMessage('Unable to verify payment. Please contact support.');
-         setIsProcessing(false);
-         onPaymentError('Unable to verify payment');
-       } else {
-         setTimeout(poll, 5000);
-       }
-     }
-   };
+          // Continue polling for other statuses
+          if (attempts >= maxAttempts) {
+            setPaymentStatus('timeout');
+            setStatusMessage('⏰ Unable to verify payment status. Please contact support.');
+            setIsProcessing(false);
+            onPaymentError('Status verification timeout');
+          } else {
+            setTimeout(poll, 5000);
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Error checking payment status:', error);
+        
+        if (attempts >= maxAttempts) {
+          setPaymentStatus('failed');
+          setStatusMessage('❌ Unable to verify payment. Please contact support if payment was deducted.');
+          setIsProcessing(false);
+          onPaymentError('Unable to verify payment status');
+        } else {
+          // Retry on error
+          setTimeout(poll, 5000);
+        }
+      }
+    };
 
-   poll();
- };
+    poll();
+  };
 
  const handleCancelPayment = () => {
    setIsProcessing(false);
